@@ -26,8 +26,12 @@ const ticTacToe = (function() {
         const $boardDiv = $(boardDivHtml);
         const $board = $(boardHtml);
         //Ask Player's Name
-        boardObj.oName = prompt('Player O, What is your name?');
-        boardObj.xName = prompt('Player X, What is your name? (If you are alone, type "CPU" to play with AI.)');
+        const name_1 = prompt('Player O, What is your name?');
+        const name_2 = prompt('Player X, What is your name? (If you are alone, type "CPU" to play with AI.)');
+        if( name_1 !== null && name_1 !== "" )
+            boardObj.oName = name_1;
+        if( name_2 !== null && name_2 !== "" )
+            boardObj.xName = name_2;
         //Append the board to the page
         $boardDiv.append($board);
         $('#start').remove();
