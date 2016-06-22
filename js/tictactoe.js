@@ -8,19 +8,19 @@ const ticTacToe = (function() {
     const boardDivHtml = '<div class="board" id="board"></div>';
     const boardHtml = $('#board').html();
     const finishHtml = '<div class="screen screen-win" id="finish"><header><h1>Tic Tac Toe</h1><p class="message">Winner!</p><a href="#" class="button" id="restartBtn">New game</a></header></div>';
-
     //Display Start Page
     exports.showStart = function(boardObj) {
         const $start = $(startHtml);
         //remove the original element
         $('#board').remove();
-        //prepend the start page element
+        // prepend the start page element
         $('body').prepend($start);
         //make start button work
         $('#startBtn').on('click', function() {
             exports.showBoard(boardObj);
         });
     };
+
     //Display Board Page
     exports.showBoard = function(boardObj) {
         const $boardDiv = $(boardDivHtml);
@@ -28,9 +28,9 @@ const ticTacToe = (function() {
         //Ask Player's Name
         const name_1 = prompt('Player O, What is your name?');
         const name_2 = prompt('Player X, What is your name? (If you are alone, type "CPU" to play with AI.)');
-        if( name_1 !== null && name_1 !== "" )
+        if (name_1 !== null && name_1 !== "")
             boardObj.oName = name_1;
-        if( name_2 !== null && name_2 !== "" )
+        if (name_2 !== null && name_2 !== "")
             boardObj.xName = name_2;
         //Append the board to the page
         $boardDiv.append($board);
@@ -78,6 +78,7 @@ const ticTacToe = (function() {
             exports.showBoard(boardObj);
         });
     };
+
     //Change Player
     exports.changePlayer = function(boardObj) {
         if (boardObj.turn === "o") {
@@ -106,7 +107,6 @@ const ticTacToe = (function() {
             clickToO(boardObj);
         }
     };
-
     function hoverToO() {
         $('.box').hover(function() {
             if ($(this).hasClass('box-filled-1') === false && $(this).hasClass('box-filled-2') === false) {
@@ -202,78 +202,74 @@ const ticTacToe = (function() {
             this.b_9 = new block();
         }
         checkGameStatus() {
-            const blockArray = [this.b_1, this.b_2, this.b_3, this.b_4, this.b_5, this.b_6, this.b_7, this.b_8, this.b_9];
-            //check horizontal
-            for (let i = 0; i < 7; i += 3) {
-                if ((blockArray[i].status + blockArray[i + 1].status + blockArray[i + 2].status) === 3) {
+                const blockArray = [this.b_1, this.b_2, this.b_3, this.b_4, this.b_5, this.b_6, this.b_7, this.b_8, this.b_9];
+                //check horizontal
+                for (let i = 0; i < 7; i += 3) {
+                    if ((blockArray[i].status + blockArray[i + 1].status + blockArray[i + 2].status) === 3) {
+                        //o win the game
+                        this.gameStatus = "o_win";
+                        exports.showFinish(this);
+                        return this.reset();
+                    } else if ((blockArray[i].status + blockArray[i + 1].status + blockArray[i + 2].status) === -3) {
+                        //x win the game
+                        this.gameStatus = "x_win";
+                        exports.showFinish(this);
+                        return this.reset();
+                    }
+                }
+                //check vertical
+                for (let i = 0; i < 3; i += 1) {
+                    if ((blockArray[i].status + blockArray[i + 3].status + blockArray[i + 6].status) === 3) {
+                        //o win the game
+                        this.gameStatus = "o_win";
+                        exports.showFinish(this);
+                        return this.reset();
+                    } else if ((blockArray[i].status + blockArray[i + 3].status + blockArray[i + 6].status) === -3) {
+                        //x win the game
+                        this.gameStatus = "x_win";
+                        exports.showFinish(this);
+                        return this.reset();
+                    }
+                }
+                //check oblique
+                if ((blockArray[0].status + blockArray[4].status + blockArray[8].status) === 3) {
                     //o win the game
                     this.gameStatus = "o_win";
                     exports.showFinish(this);
                     return this.reset();
-                } else if ((blockArray[i].status + blockArray[i + 1].status + blockArray[i + 2].status) === -3) {
+                } else if ((blockArray[0].status + blockArray[4].status + blockArray[8].status) === -3) {
                     //x win the game
                     this.gameStatus = "x_win";
                     exports.showFinish(this);
                     return this.reset();
                 }
-            }
-            //check vertical
-            for (let i = 0; i < 3; i += 1) {
-                if ((blockArray[i].status + blockArray[i + 3].status + blockArray[i + 6].status) === 3) {
-                    //o win the game
-                    this.gameStatus = "o_win";
-                    exports.showFinish(this);
-                    return this.reset();
-                } else if ((blockArray[i].status + blockArray[i + 3].status + blockArray[i + 6].status) === -3) {
-                    //x win the game
-                    this.gameStatus = "x_win";
-                    exports.showFinish(this);
-                    return this.reset();
-                }
-            }
-            //check oblique
-            if ((blockArray[0].status + blockArray[4].status + blockArray[8].status) === 3) {
-                //o win the game
-                this.gameStatus = "o_win";
-                exports.showFinish(this);
-                return this.reset();
-            } else if ((blockArray[0].status + blockArray[4].status + blockArray[8].status) === -3) {
-                //x win the game
-                this.gameStatus = "x_win";
-                exports.showFinish(this);
-                return this.reset();
-            }
 
-            if ((blockArray[2].status + blockArray[4].status + blockArray[6].status) === 3) {
-                //x win the game
-                this.gameStatus = "o_win";
-                exports.showFinish(this);
-                return this.reset();
-            } else if ((blockArray[2].status + blockArray[4].status + blockArray[6].status) === -3) {
-                //x win the game
-                this.gameStatus = "x_win";
-                exports.showFinish(this);
-                return this.reset();
-            }
-            //check if all block are not 0
-            let checkDraw = 0;
-            for (let i = 0; i < 9; i++) {
-                if (blockArray[i].status !== 0) {
-                    checkDraw++;
+                if ((blockArray[2].status + blockArray[4].status + blockArray[6].status) === 3) {
+                    //x win the game
+                    this.gameStatus = "o_win";
+                    exports.showFinish(this);
+                    return this.reset();
+                } else if ((blockArray[2].status + blockArray[4].status + blockArray[6].status) === -3) {
+                    //x win the game
+                    this.gameStatus = "x_win";
+                    exports.showFinish(this);
+                    return this.reset();
+                }
+                //check if all block are not 0
+                let checkDraw = 0;
+                for (let i = 0; i < 9; i++) {
+                    if (blockArray[i].status !== 0) {
+                        checkDraw++;
+                    }
+                }
+                if (checkDraw === 9) {
+                    this.gameStatus = "draw";
+                    exports.showFinish(this);
+                    return this.reset();
                 }
             }
-            if (checkDraw === 9) {
-                this.gameStatus = "draw";
-                exports.showFinish(this);
-                return this.reset();
-            } else {
-                return console.log("not finish");
-            }
-        }
-        //Reset Board Object
+            //Reset Board Object
         reset() {
-            console.log("reset");
-            console.log(this);
             this.oName = "Player1";
             this.xName = "Player2";
             this.gameStatus = "not_finish";
