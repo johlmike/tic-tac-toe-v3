@@ -27,7 +27,7 @@ const ticTacToe = (function() {
         const $board = $(boardHtml);
         //Ask Player's Name
         const name_1 = prompt('Player O, What is your name?');
-        const name_2 = prompt('Player X, What is your name? (If you are alone, type "CPU" to play with AI.)');
+        const name_2 = prompt('Player X, What is your name?');
         if (name_1 !== null && name_1 !== "")
             boardObj.oName = name_1;
         if (name_2 !== null && name_2 !== "")
