@@ -27,7 +27,7 @@ const ticTacToe = (function() {
         const $board = $(boardHtml);
         //Ask Player's Name
         const name_1 = prompt('Player O, What is your name?');
-        const name_2 = prompt('Player X, What is your name?');
+        const name_2 = prompt('Player X, What is your name? (Type "ai" if you want to play alone.)');
         if (name_1 !== null && name_1 !== "")
             boardObj.oName = name_1;
         if (name_2 !== null && name_2 !== "")
@@ -82,17 +82,40 @@ const ticTacToe = (function() {
     //Change Player
     exports.changePlayer = function(boardObj) {
         if (boardObj.turn === "o") {
-            //Change turn to x
-            boardObj.turn = "x";
-            //Delete player 1 's class
-            $('#player1').removeClass('players-turn active');
-            //Change to player 2
-            $('#player2').addClass("players-turn active");
-            //Let block hover can change the style to X
-            hoverToX();
-            //Change the block status when it has been click
-            //Block will be set to X
-            clickToX(boardObj);
+            //If player 2 is not ai, then let player2 control
+            if (boardObj.xName !== "ai") {
+                //Change turn to x
+                boardObj.turn = "x";
+                //Delete player 1 's class
+                $('#player1').removeClass('players-turn active');
+                //Change to player 2
+                $('#player2').addClass("players-turn active");
+                //Let block hover can change the style to X
+                hoverToX();
+                //Change the block status when it has been click
+                //Block will be set to X
+                clickToX(boardObj);
+            } else { //Control by AI
+                //Find empty blocks and put into an array
+                let emptyBlock = [];
+                for (let i = 1; i < 10; i++) {
+                    const blockID = 'b_' + i;
+                    if (boardObj[blockID].status === 0) {
+                        emptyBlock.push({
+                            block: boardObj[blockID],
+                            blockid: blockID
+                        });
+                    }
+                }
+                //If the board still have empty block, then AI will pick a block randomly and filled with X
+                if (emptyBlock.length !== 0) {
+                    let randNum = Math.round(Math.random() * (emptyBlock.length - 1));
+                    let id = '#' + emptyBlock[randNum].blockid;
+                    emptyBlock[randNum].block.setX();
+                    $(id).css('background-color', '');
+                    $(id).addClass('box-filled-2');
+                }
+            }
         } else {
             //Change turn to o
             boardObj.turn = "o";
@@ -107,6 +130,7 @@ const ticTacToe = (function() {
             clickToO(boardObj);
         }
     };
+
     function hoverToO() {
         $('.box').hover(function() {
             if ($(this).hasClass('box-filled-1') === false && $(this).hasClass('box-filled-2') === false) {
@@ -201,74 +225,77 @@ const ticTacToe = (function() {
             this.b_8 = new block();
             this.b_9 = new block();
         }
+
+        //Check game status and stop the game if it is over 
         checkGameStatus() {
-                const blockArray = [this.b_1, this.b_2, this.b_3, this.b_4, this.b_5, this.b_6, this.b_7, this.b_8, this.b_9];
-                //check horizontal
-                for (let i = 0; i < 7; i += 3) {
-                    if ((blockArray[i].status + blockArray[i + 1].status + blockArray[i + 2].status) === 3) {
-                        //o win the game
-                        this.gameStatus = "o_win";
-                        exports.showFinish(this);
-                        return this.reset();
-                    } else if ((blockArray[i].status + blockArray[i + 1].status + blockArray[i + 2].status) === -3) {
-                        //x win the game
-                        this.gameStatus = "x_win";
-                        exports.showFinish(this);
-                        return this.reset();
-                    }
-                }
-                //check vertical
-                for (let i = 0; i < 3; i += 1) {
-                    if ((blockArray[i].status + blockArray[i + 3].status + blockArray[i + 6].status) === 3) {
-                        //o win the game
-                        this.gameStatus = "o_win";
-                        exports.showFinish(this);
-                        return this.reset();
-                    } else if ((blockArray[i].status + blockArray[i + 3].status + blockArray[i + 6].status) === -3) {
-                        //x win the game
-                        this.gameStatus = "x_win";
-                        exports.showFinish(this);
-                        return this.reset();
-                    }
-                }
-                //check oblique
-                if ((blockArray[0].status + blockArray[4].status + blockArray[8].status) === 3) {
+            const blockArray = [this.b_1, this.b_2, this.b_3, this.b_4, this.b_5, this.b_6, this.b_7, this.b_8, this.b_9];
+            //check horizontal
+            for (let i = 0; i < 7; i += 3) {
+                if ((blockArray[i].status + blockArray[i + 1].status + blockArray[i + 2].status) === 3) {
                     //o win the game
                     this.gameStatus = "o_win";
                     exports.showFinish(this);
                     return this.reset();
-                } else if ((blockArray[0].status + blockArray[4].status + blockArray[8].status) === -3) {
+                } else if ((blockArray[i].status + blockArray[i + 1].status + blockArray[i + 2].status) === -3) {
                     //x win the game
                     this.gameStatus = "x_win";
-                    exports.showFinish(this);
-                    return this.reset();
-                }
-
-                if ((blockArray[2].status + blockArray[4].status + blockArray[6].status) === 3) {
-                    //x win the game
-                    this.gameStatus = "o_win";
-                    exports.showFinish(this);
-                    return this.reset();
-                } else if ((blockArray[2].status + blockArray[4].status + blockArray[6].status) === -3) {
-                    //x win the game
-                    this.gameStatus = "x_win";
-                    exports.showFinish(this);
-                    return this.reset();
-                }
-                //check if all block are not 0
-                let checkDraw = 0;
-                for (let i = 0; i < 9; i++) {
-                    if (blockArray[i].status !== 0) {
-                        checkDraw++;
-                    }
-                }
-                if (checkDraw === 9) {
-                    this.gameStatus = "draw";
                     exports.showFinish(this);
                     return this.reset();
                 }
             }
-            //Reset Board Object
+            //check vertical
+            for (let i = 0; i < 3; i += 1) {
+                if ((blockArray[i].status + blockArray[i + 3].status + blockArray[i + 6].status) === 3) {
+                    //o win the game
+                    this.gameStatus = "o_win";
+                    exports.showFinish(this);
+                    return this.reset();
+                } else if ((blockArray[i].status + blockArray[i + 3].status + blockArray[i + 6].status) === -3) {
+                    //x win the game
+                    this.gameStatus = "x_win";
+                    exports.showFinish(this);
+                    return this.reset();
+                }
+            }
+            //check oblique
+            if ((blockArray[0].status + blockArray[4].status + blockArray[8].status) === 3) {
+                //o win the game
+                this.gameStatus = "o_win";
+                exports.showFinish(this);
+                return this.reset();
+            } else if ((blockArray[0].status + blockArray[4].status + blockArray[8].status) === -3) {
+                //x win the game
+                this.gameStatus = "x_win";
+                exports.showFinish(this);
+                return this.reset();
+            }
+
+            if ((blockArray[2].status + blockArray[4].status + blockArray[6].status) === 3) {
+                //x win the game
+                this.gameStatus = "o_win";
+                exports.showFinish(this);
+                return this.reset();
+            } else if ((blockArray[2].status + blockArray[4].status + blockArray[6].status) === -3) {
+                //x win the game
+                this.gameStatus = "x_win";
+                exports.showFinish(this);
+                return this.reset();
+            }
+            //check if all block are not 0
+            let checkDraw = 0;
+            for (let i = 0; i < 9; i++) {
+                if (blockArray[i].status !== 0) {
+                    checkDraw++;
+                }
+            }
+            if (checkDraw === 9) {
+                this.gameStatus = "draw";
+                exports.showFinish(this);
+                return this.reset();
+            }
+        }
+
+        //Reset Board Object
         reset() {
             this.oName = "Player1";
             this.xName = "Player2";
